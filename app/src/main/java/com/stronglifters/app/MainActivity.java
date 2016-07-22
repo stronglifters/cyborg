@@ -22,15 +22,20 @@ public class MainActivity extends AppCompatActivity implements TurbolinksAdapter
     turbolinksView = (TurbolinksView) findViewById(R.id.turbolinks_view);
 
     // this for debug builds of your app (it is off by default)
-    // TurbolinksSession.getDefault(this).setDebugLoggingEnabled(true);
+    TurbolinksSession.getDefault(this).setDebugLoggingEnabled(true);
 
-    location = getIntent().getStringExtra(INTENT_URL) != null ? getIntent().getStringExtra(INTENT_URL) : BASE_URL;
+    location = loadLocation();
 
     TurbolinksSession.getDefault(this)
       .activity(this)
       .adapter(this)
       .view(turbolinksView)
       .visit(location);
+  }
+
+  private String loadLocation(){
+    String intent = getIntent().getStringExtra(INTENT_URL);
+    return intent == null ? BASE_URL : intent;
   }
 
   @Override
@@ -68,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements TurbolinksAdapter
   public void visitProposedToLocationWithAction(String location, String action) {
     Intent intent = new Intent(this, MainActivity.class);
     intent.putExtra(INTENT_URL, location);
-
     this.startActivity(intent);
   }
 
@@ -79,7 +83,15 @@ public class MainActivity extends AppCompatActivity implements TurbolinksAdapter
         .adapter(this)
         .restoreWithCachedSnapshot(false)
         .view(turbolinksView)
-        .visit(BASE_URL + "/error");
+        .visit(BASE_URL + "/404");
+    }
+    else {
+      TurbolinksSession.getDefault(this)
+        .activity(this)
+        .adapter(this)
+        .restoreWithCachedSnapshot(false)
+        .view(turbolinksView)
+        .visit(BASE_URL + "/500");
     }
   }
 }
